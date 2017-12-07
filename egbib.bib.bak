@@ -1,0 +1,72 @@
+% Encoding: UTF-8
+
+@Article{Chen2016a,
+  author  = {Chen, LC and Papandreou, G and Kokkinos, I and Murphy, K and Yuille, AL},
+  title   = {DeepLab: Semantic Image Segmentation with Deep Convolutional Nets},
+  journal = {Atrous Convolution, and Fully Connected CRFs. arXiv},
+  year    = {2016},
+}
+
+@Article{Xu1998,
+  author    = {Xu, Chenyang and Prince, Jerry L},
+  title     = {Snakes, shapes, and gradient vector flow},
+  journal   = {IEEE Transactions on image processing},
+  year      = {1998},
+  volume    = {7},
+  number    = {3},
+  pages     = {359--369},
+  publisher = {IEEE},
+}
+
+@Article{Cohen1991,
+  author    = {Cohen, Laurent D},
+  title     = {On active contour models and balloons},
+  journal   = {CVGIP: Image understanding},
+  year      = {1991},
+  volume    = {53},
+  number    = {2},
+  pages     = {211--218},
+  publisher = {Elsevier},
+}
+
+@Article{Kass1988,
+  author    = {Kass, Michael and Witkin, Andrew and Terzopoulos, Demetri},
+  title     = {Snakes: Active contour models},
+  journal   = {International journal of computer vision},
+  year      = {1988},
+  volume    = {1},
+  number    = {4},
+  pages     = {321--331},
+  publisher = {Springer},
+}
+
+@Article{Lucic2005,
+  author    = {Lu{\v{c}}i{\'c}, Vladan and F{\"o}rster, Friedrich and Baumeister, Wolfgang},
+  title     = {Structural studies by electron tomography: from cells to molecules},
+  journal   = {Annu. Rev. Biochem.},
+  year      = {2005},
+  volume    = {74},
+  pages     = {833--865},
+  publisher = {Annual Reviews},
+}
+
+@InProceedings{Chen2016,
+  author        = {Chen, Hao and Qi, Xiaojuan and Yu, Lequan and Heng, Pheng-Ann},
+  title         = {Dcan: Deep contour-aware networks for accurate gland segmentation},
+  booktitle     = {Proceedings of the IEEE conference on Computer Vision and Pattern Recognition},
+  year          = {2016},
+  pages         = {2487--2496},
+  __markedentry = {[Administrator:]},
+}
+
+@InProceedings{Cheng2017,
+  author        = {Cheng, Zhou and Li, Jiancheng and Yuan, Chun},
+  title         = {Gate function based structure-aware convolution for scene semantic segmentation},
+  booktitle     = {Multimedia and Expo (ICME), 2017 IEEE International Conference on},
+  year          = {2017},
+  pages         = {253--258},
+  organization  = {IEEE},
+  __markedentry = {[Administrator:6]},
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}

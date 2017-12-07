@@ -1,0 +1,97 @@
+\section{EXPERIMENTS}
+In this section, we will evaluate our model with several state of the art methods on segmenting the synaptic cleft region in cryo-electron tomography data \cite{Lucic2005}.
+
+~\noindent\textbf{Dataset}
+The synaptic images are obtained by cryo-electron tomography, from which we can directly observe a native environment of synaptic structure in a much high resolution (about $1500\times 1500$).
+And localizing the accurate contour of a target region in such a crowded and natural environment is vary challenge, due to high nose and low signal-to-noise ratio.
+In this paper, our goal is to segmenting the synaptic cleft region, where is adjacent to a synapse and receives neurotransmitter molecules from another synapse.
+Especially, only the cleft between two synapse, whose width is about $20\sim30nm$ ($40\sim70$ pixels in our cryo-electron tomography), might by our plausible synaptic cleft, as shown in Figure~.
+For evaluating our method, we build a synaptic cleft segmentation dataset, consisting $400$ synaptic images for training and $159$ images for testing.
+All the image are observed in raw resolution and labeled by biomedical experts.
+
+~\noindent\textbf{Implementation Details}
+The training strategy of our DeepLab mode follows \cite{Chen2016a}.
+For such a large resolution, we crop a $481\times 481$ region \cite{Chen2016} from the original image as the input to DeepLab.
+In order to avoid over fitting, the training dataset is augmented by flipping and rotation, finally containing $19200$ images.
+
+During curve evolving, $\alpha$, $\beta$, $\kappa$ and $\gamma$ are respectively set as $0.2$, $0.2$, $0.3$ and $1$, which can give a best performance in our dataset.
+For synchronous growing, $\rho$ is set as $0.25$ and $\tau_1$, $\tau_2$ are $-\frac{\sqrt{2}}{2}$, $\frac{\sqrt{2}}{2}$ to constraint the direction of a new piece of contour to deviating $[-\frac{\pi}{4},\frac{\pi}{4}]$ from last growing direction.
+And when $d^{t}$ is beyond the range of $[40,80]$, the growing is terminated.
+
+We use two metrics \cite{Cheng2017} to evaluate our method on segmentation task:
+a) pixel accuracy, which evaluates the percentage of positive true pixels over the whole pixels;
+b) pixel intersection-overunion (IOU) averaged across different classes.
+
+\begin{figure}[t]
+\begin{minipage}[b]{1.0\linewidth}
+  \centering
+ \centerline{\epsfig{figure=figs/FigGVFa.pdf,width=8.5cm}}
+  \centerline{(a) Tension field by GVF.}\medskip
+\end{minipage}
+\begin{minipage}[b]{1.0\linewidth}
+ \centerline{\epsfig{figure=figs/FigGVFb.pdf,width=8.5cm}}
+  \centerline{(a) Tension field by normal force.}\medskip
+\end{minipage}
+%
+\caption{Several examples of tension field obtained by GVF and normal force. Each column corresponds to one example.}
+\label{fig:gvf}
+\end{figure}
+~ \noindent\textbf{Superiority of Eq.~\ref{Eq:update}.}
+In this part, we visualize the mentioned deficiencies in Sec.~\ref{sec:curve_evolving} and show the superiority of our updating strategy of Eq.~\ref{Eq:update}.
+Firstly, in some flat region with small gradients $\mathbf{f}$, the external tension is too weak to drive $\mathbf{v}(s)$ to move against to internal tension, which gives a high demand on initial curve to be away from those flat regions (first example in Figure~\ref{fig:gvf}).
+Secondly, the external tension in some noisy regions will be gyrate, which easily trap some $\mathbf{v}(s)$.
+It is frustrating that although the internal tension may pull the trapped point out sometimes, $\mathbf{f}$ will soon trap it again.
+However using our evolving strategy , once $\mathbf{v}(s)$ is pulled away from the noisy region with small $E_{ext}$, our external tension with fixed normal direction will soon push it away (second example in Figure~\ref{fig:gvf}).
+Thirdly, since the gradients $\mathbf{f}$ near to contours are usually large (Figure~\ref{fig:gvf}), $\mathbf{v}(s)$ easily cross the optimal positions by over-huge tension.
+And our external tension are controlled by $E_{ext}$, which will soon vanish in contour region and make the updating more robust (third example in Figure~\ref{fig:gvf}).
+
+~\noindent\textbf{Results}
+We evaluate several state of the art segmentation methods with our proposed model in segmenting synaptic cleft region, including FCN \cite{Long2015}, U-net \cite{Ronneberger2015}, DeepLab(ResNet-101) \cite{Chen2016a} and PSPNet \cite{Zhao2016}.
+Several improved strategies have been tried to give a best performance, including weighted loss function, transfer learning and post-processing.
+Table~\ref{tab:report1} reports the pixel accuracy and mean IOU of different methods and Figure~ represents some results from different methods.
+From the Table, we can find that our contour growing algorithm can significantly improve the performance of single CNN based model.
+Observed from Figure, our experiments prove the deficiency of CNN in localizing accurate contours, which can be remedied by our contour growing algorithm.
+Especially due to the deeper architecture of PSPNet \cite{Zhao2016}, it gives a better performance over other sole CNN models.
+\begin{table}[t]
+\begin{center}
+\caption{Table caption} \label{tab:report1}
+\begin{tabular}{|c|c|c|}
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+   & Pixel Accu. & Neab IOU
+  \\
+  \hline
+  FCN & Cell 2 & Cell 3 \\
+  Unet & Cell 5 & Cell 6 \\
+  DeepLab(ResNet-101) & Cell 5 & Cell 6 \\
+  DeepLab(ResNet-101)+CRF & Cell 5 & Cell 6 \\
+  PSPNet & Cell 5 & Cell 6 \\
+  Ours & Cell 5 & Cell 6 \\
+  \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+Furthermore, we replace our pre-segmentation model with other CNN based methods to explore the robustness of our model to different initial curve.
+Table gives the results, where we can find that there is no obvious improvement by using better pre-segmenting model.
+It demonstrates that so long as the correct location of synaptic cleft region is provided, our model can localize the whole contours of target region.
+
+\begin{table}[t]
+\begin{center}
+\caption{Table caption} \label{tab:report1}
+\begin{tabular}{|c|c|c|}
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+   & Pixel Accu. & Neab IOU
+  \\
+  \hline
+  FCN$+$contour growing & Cell 2 & Cell 3 \\
+  Unet$+$contour growing & Cell 5 & Cell 6 \\
+  DeepLab$+$contour growing & Cell 5 & Cell 6 \\
+  Resnet$+$contour growing & Cell 5 & Cell 6 \\
+  \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+

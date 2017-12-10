@@ -1,12 +1,12 @@
 \section{EXPERIMENTS}
-In this section, we will evaluate our model with several state of the art methods on segmenting the synaptic cleft region in cryo-electron tomography data \cite{Lucic2005}.
+In this section, we will evaluate our model with several state of the art methods on segmenting the synaptic cleft region in electron micrographs.
 
 ~\noindent\textbf{Dataset}
-The synaptic images are obtained by cryo-electron tomography, from which we can directly observe a native environment of synaptic structure in a much high resolution (about $1500\times 1500$).
+The synaptic images are obtained by cryo-electron tomography (CET), from which we can directly observe a native environment of synaptic structure in a much high resolution (about $1500\times 1500$).
 And localizing the accurate contour of a target region in such a crowded and natural environment is vary challenge, due to high nose and low signal-to-noise ratio.
-In this paper, our goal is to segmenting the synaptic cleft region, where is adjacent to a synapse and receives neurotransmitter molecules from another synapse.
-Especially, only the cleft between two synapse, whose width is about $20\sim30nm$ ($40\sim70$ pixels in our cryo-electron tomography), might by our plausible synaptic cleft, as shown in Figure~.
-For evaluating our method, we build a synaptic cleft segmentation dataset, consisting $400$ synaptic images for training and $159$ images for testing.
+In this paper, our goal is to segmenting the synaptic cleft region, which is adjacent to a synapse and receives neurotransmitter molecules from another synapse.
+Especially, only the cleft between two synapse, whose width is about $20\sim30$ nm ($40\sim70$ pixels in our electron micrographs), might by our plausible synaptic cleft, as shown in Figure~.
+For evaluating our method, we build a synaptic electron micrographs dataset, consisting $400$ synaptic images for training and $159$ images for testing.
 All the image are observed in raw resolution and labeled by biomedical experts.
 
 ~\noindent\textbf{Implementation Details}

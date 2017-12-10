@@ -32,11 +32,11 @@
 %
 \begin{abstract}
 Synaptic cleft is an importance area for neuroscientists to analyse the macromolecular complexes related to neurotransmitter transmission.
-However the high noise and low signal-to-noise ratio of raw tomogram make it great challenging to automatically segment.
+However the high noise and low signal-to-noise ratio of raw electron micrographs make it great challenging to automatically segment.
 In this paper, we proposed a novel contour growing algorithm combined with deep convolutional networks to localize the accurate synaptic cleft region in such high noisy images.
 Starting with an initial segmentation form deep convolutional networks, our growing algorithm first finds out an initial piece of contour from the pre-segmentation, and then grows it to localize the whole synaptic cleft region.
-Different from the region based methods and dense prediction networks, our model focus on localizing the plausible contours rather than internal texture, which is more robust to the noise in tomogram data.
-Experiments will demonstrate the effectiveness and superiority of our proposed method on segmenting the target regions in cryo-electron tomogram data.
+Different from the region based methods and dense prediction networks, our model focus on localizing the plausible contours rather than internal texture, which is more robust to the noise in electron micrographs.
+Experiments will demonstrate the effectiveness and superiority of our proposed method on segmenting the target regions in electron micrographs.
 \end{abstract}
 %
 \begin{keywords}
@@ -44,12 +44,14 @@ Biomedical segmentation, deep convolutional networks, contour growing, active co
 \end{keywords}
 %
 %%%%%%%%% BODY TEXT
+\input{Introduction}
+\input{Related}
 \input{Methods}
 \input{Experiments}
 \section{CONCLUSION}
 \label{sec:conclusion}
 In this paper, we provide an effective method to segment the synaptic cleft region in challenging cryo-electron tomography data.
-With the help of pre-segmenting by CNNs, our contour growing algorithm can accurately localize the whole contour of the synaptic cleft, which is more robust to noise and complex shape of target region.
+With the help of pre-segmenting by CNNs, our contour growing algorithm can accurately localize the whole contour of the synaptic cleft, which is more robust to noise and complex texture of target region.
 Especially, a new updating strategy for contour evolving method is superior to traditional GVF, which can be extended to many tasks.
 The experiments show that our framework is very effective in segmenting synaptic cleft, which is significant for biomedical analysis.
 

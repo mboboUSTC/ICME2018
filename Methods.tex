@@ -4,16 +4,6 @@ a) a CNN based model providing a coarse segmentation of synaptic cleft;
 b) a contour growing algorithm that use the coarse segmentation to localize whole contours of synaptic cleft region.
 The pipeline of our framework is illustrated in Figure~\ref{fig:cg}.
 
-\begin{figure*}[t]
-    \begin{center}
-        \includegraphics[width=7in]{figs/FigCG.pdf}
-   \end{center}
-\caption{A brief view of our model in localizing the synaptic cleft region. First a CNN based model results in a coarse segmentation mask, which provides an initial curve (green line) in cleft region.
-        Then, the initial curve is respectively evolved along opposite direction ($\mathbf{n}_+$ and $\mathbf{n}_-$) to obtain two piece of initial contours (red dotted line).
-        Finally, we will synchronously grow the contours to localize the whole synaptic cleft region (encircled by red solid curves).}
-\label{fig:cg}
-\end{figure*}
-
 \subsection{Pre-segmentation}
 To accurately localize the location of our target regions, deep convolutional networks are first implemented to give a coarse segmentation for synaptic cleft.
 The architecture of the networks are based on famous DeepLab \cite{Chen2016a}, which uses the dilated convolution for lager reception field.
@@ -73,15 +63,6 @@ The final evolved curves are respectively denoted as $\mathbf{c}_1(s)$ and $\mat
 \label{fig:g}
 \end{figure}
 
-\begin{figure}[t]
-\begin{minipage}[b]{1.0\linewidth}
-  \centering
- \centerline{\epsfig{figure=Figs/FigSG.pdf,width=8.5cm}}
-\end{minipage}
-\caption{Diagram of different situations illustrated in Eq.~\ref{Eq:gf}.
-        The green line is the new growing contour, while the red line is the previous contour}
-\label{fig:sg}
-\end{figure}
 \subsubsection{synchronous growing}
 With two pieces of contour $\mathbf{c}_1(s)$ and $\mathbf{c}_2(s)$, we then grow them to localize the whole presynaptic and postsynaptic membranes.
 The challenge of this part is that they should be grown correctly and synchronously to compute the exact distance between two membranes for termination judging.
@@ -117,3 +98,12 @@ The distance between two membranes can be calculated by:
 d^{t+1} = \frac{||c_1^{t+1}(1)-c_2^{t+1}(1)||+ ||c_1^{t+1}(0)-c_2^{t+1}(0)||}{2}
 \end{eqnarray}
 Once $d^{t+1}$ is beyond the range of reasonable cleft width, the growing will be terminated.
+\begin{figure}[t]
+\begin{minipage}[b]{1.0\linewidth}
+  \centering
+ \centerline{\epsfig{figure=Figs/FigSG.pdf,width=8.5cm}}
+\end{minipage}
+\caption{Diagram of different situations illustrated in Eq.~\ref{Eq:gf}.
+        The green line is the new growing contour, while the red line is the previous contour}
+\label{fig:sg}
+\end{figure}

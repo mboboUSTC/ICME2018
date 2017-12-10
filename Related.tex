@@ -1,0 +1,10 @@
+\section{RELATED WORKS}
+Fully convolutional networks are commonly used in many segmentation tasks \cite{Long2015,Badrinarayanan2015,Noh2015,Ronneberger2015,Chen2016a,Chen2017,Zhao2016}, which use the uppooling \cite{Badrinarayanan2015} and transposed convolutional \cite{Noh2015} to generate dense predictions.
+However due to the successive downsampling layers used in FCN, the localized contours are usually poor and coarse.
+To this end, \cite{Chen2016a} proposed the dilated convolution by introducing zeros into original kernel, which enlarges the perception field and reduce the usage of pooling layers.
+U-net \cite{Ronneberger2015} directly concatenates the lower and higher feature maps to supplement the lost detail information by downsampling.
+Recently, a multi-task framework by simultaneously implementing semantic segmentation and contour predictions is developed by DCAN \cite{Chen2017}.
+They use the auxiliary contours to optimize the segmentations and obtained state-of-the-art performance in challenging medical segmentation. 
+PSPNet \cite{Zhao2016} is the state of the art segmentation model in many segmentation competitions such as PASCAL VOC and cityscapes.
+It utilized the powerful ResNet \cite{He2016} for feature extraction and proposed a global pyramid pooling module for better detail predictions.
+In this paper, we develop a new framework to process a more challenging task, which is also important but difficult for existing methods as illustrated in Sec. \ref{sec:intro}. 

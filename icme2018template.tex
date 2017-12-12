@@ -6,6 +6,12 @@
 \usepackage{spconf,amsmath,epsfig}
 
 \pagestyle{empty}
+\usepackage{color}
+
+\newcommand{\comments}[1]{}
+\newcommand{\xj}[1]{\textcolor{red}{(xuejin: #1)}}
+\newcommand{\change}[1]{\textcolor{blue}{#1}}
+
 
 
 \begin{document}\sloppy
@@ -18,11 +24,12 @@
 
 % Title.
 % ------
-\title{ACCURATE SEGMENTATION OF SYNAPTIC CLEARANCE WITH DEEP CONVOLUTIONAL NETWORKS AND A NOVEL CONTOUR GROWING ALGORITHM}
+%\title{ACCURATE SEGMENTATION OF SYNAPTIC CLEARANCE WITH DEEP CONVOLUTIONAL NETWORKS AND A NOVEL CONTOUR GROWING ALGORITHM}
+\title{Accurate Segmentation of Synaptic Clearance with post contour growing conjuncated with a ConvNet}
 %
 % Single address.
 % ---------------
-\name{Anonymous ICME submission}
+\name{Paper 1378}
 \address{}
 
 
@@ -31,16 +38,26 @@
 
 %
 \begin{abstract}
-Synaptic cleft is an importance area for neuroscientists to analyse the macromolecular complexes related to neurotransmitter transmission.
-However the high noise and low signal-to-noise ratio of raw electron micrographs make it great challenging to automatically segment.
-In this paper, we proposed a novel contour growing algorithm combined with deep convolutional networks to localize the accurate synaptic cleft region in such high noisy images.
-Starting with an initial segmentation form deep convolutional networks, our growing algorithm first finds out an initial piece of contour from the pre-segmentation, and then grows it to localize the whole synaptic cleft region.
-Different from the region based methods and dense prediction networks, our model focus on localizing the plausible contours rather than internal texture, which is more robust to the noise in electron micrographs.
-Experiments will demonstrate the effectiveness and superiority of our proposed method on segmenting the target regions in electron micrographs.
+
+Synaptic cleft is an importance area for neuroscientists to analyze the macromolecular complexes related to neurotransmission.
+However, the large amount of noise and low signal-to-noise ratio in raw electron micrographs make it significantly challenging to extract this region automatically.
+%
+In this paper, we propose a simple but effective framework to automatically extract accurate boundaries of synaptic cleft regions. 
+Our approach concatenates a contour growing step to a fully convolutional network (FCN), so that it takes the advantage of large receptive fields of FCNs to precisely localize the synaptic cleft region in a noisy image, and then precisely extract the region boundaries by a fine-level contour evolution technique. 
+%
+While considering both the texture and contours, our approach is more robust to noises, and outperforms all existing single-model FCNs on accurate segmentation in electron micrographs.
+
+\comments{
+In this paper, we proposed a novel contour extraction algorithm combined with a fully convolutional network to localize the accurate synaptic cleft region in such highly noisy images.
+%
+Starting with an initial segmentation form a fully convolutional network, our contour extraction algorithm first finds out an initial piece of contour from the pre-segmentation, and then grows it to localize the whole synaptic cleft region.
+Different from previous region-based techniques or dense prediction networks, our model focuses on localizing the exact contours rather than the internal texture, which is more robust to noises in electron micrographs.
+Experiments demonstrate the effectiveness and superiority of our proposed method on segmenting the target regions in electron micrographs.
+}
 \end{abstract}
 %
 \begin{keywords}
-Biomedical segmentation, deep convolutional networks, contour growing, active contour deformation,
+Synaptic clef extraction, fully convolutional networks, active contours, contour growing
 \end{keywords}
 %
 %%%%%%%%% BODY TEXT

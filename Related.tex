@@ -1,16 +1,30 @@
 \section{Related Work}
 %
-\change{Image segmentation has been studied for decades from the early time of computer vision. While comprehensive survey is out of the scope of this paper, we briefly introduce ... in this section.}
-
+Image segmentation has been studied for decades from the early time of computer vision. While comprehensive survey is out of the scope of this paper, we briefly introduce most related works in this section.
 
 Fully convolutional networks are commonly used in many segmentation tasks \cite{Long2015,Badrinarayanan2015,Noh2015,Ronneberger2015,Chen2016a,Chen2017,Zhao2016}, which use the uppooling \cite{Badrinarayanan2015} and transposed convolutional \cite{Noh2015} to generate dense predictions.
 However due to the successive downsampling layers used in FCN, the localized contours are usually poor and coarse.
-To this end, \cite{Chen2016a} proposed the dilated convolution by introducing zeros into original kernel, which enlarges the perception field and reduces the usage of pooling layers.
-U-net \cite{Ronneberger2015} directly concatenates the lower and higher feature maps to supplement the lost detail information by downsampling.
-Recently, a multi-task framework by simultaneously implementing semantic segmentation and contour predictions is developed by DCAN \cite{Chen2017}.
-They use the auxiliary contours to optimize the segmentations and obtained state-of-the-art performance in challenging medical segmentation. 
-PSPNet \cite{Zhao2016} is the state of the art segmentation model in many segmentation competitions such as PASCAL VOC and cityscapes.
+To this end, Chen et al.~\cite{Chen2016a} proposed the dilated convolution by applying the convolution at different dilation factors to enlarge its perception field and using discrete CRF models for further promotion.
+Instead of post-processing, Pinheiro et al.~\cite{Pinheiro2014} used the recurrent neural network to implement the mean field inference of CRF, which can jointly train FCNs and CRF.
+The U-shaped networks in Unet \cite{Badrinarayanan2015} can give a finer contour localization by directly supplement detail information to higher layers.
+Similar method is proposed in [RefineNet], which exploits all the information along the down-sampling process to enable high-resolution prediction.
+Recently, multi-task frameworks are popular by simultaneously implementing semantic segmentation and contour predictions.
+For example,  Chen et al.\cite{Chen2017} used the auxiliary contours to optimize the segmentations in challenging medical segmentation and Chen et al.\cite{Chen2016Semantic} replaced the CRF inference with domain transform to capture object boundaries as an end-to-end framework.
+PSPNet \cite{Zhao2016} is the state of the art segmentation model in many segmentation competitions.
 It utilized the powerful ResNet \cite{He2016} for feature extraction and proposed a global pyramid pooling module for better detail predictions.
-In this paper, we develop a new framework to process a more challenging task, which is also important but difficult for existing methods as illustrated in Sec. \ref{sec:intro}. 
 
-\xj{There should be another paragraph introducing contour-based methods.}
+Contour based methods are another kind of famous techniques for image segmentation.
+Since the active contour was first introduced by Kass et al.~\cite{Kass1988}, it has become one of the most popular tools in contour based segmentation.
+However due to the local and unspecific features used by external tension, much efforts have been made to increase the robustness of active contours.
+Cohen et al.~\cite{Cohen1991} added a balloon force as a constant tension to drive the curve away from flat regions.
+Xu et al.~\cite{Xu1998} proposed a gradient vector flows method for a larger caption field of external tension.
+Leventon et al.~\cite{Leventon2003Statistical} and Tsai et al.~\cite{Tsai2003A}  made efforts to employ different regularizing on the curves to make the contour evolution more robust.
+Latter, open active contour models have been proposed for medical image analysis, which are designed for extracting tree-shaped structures \cite{Li2009Actin,Xu2013EXTRACTION} by evolving and growing.
+Li et al.~\cite{Li2009Actin} introduces the famous stretching open active contour (SOAC) model for extracting actin filaments, by adding non-intensity-adaptive stretching term.
+And Xu et al.~\cite{Xu2013EXTRACTION} proposed to extract the clear networks of actin filaments by automatically initializing multiple SOAC models and re-grouping their segmentations.
+
+Based on the above successful methods, we propose a novel contour growing method, which is more robust to noise with the novel evolving and growing strategies.
+And combined with FCNs, we develop a new framework to process a more challenging task, which is difficult for existing methods as illustrated in Sec. \ref{sec:intro}.
+
+
+

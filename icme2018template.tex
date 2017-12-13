@@ -39,11 +39,11 @@
 %
 \begin{abstract}
 
-Synaptic cleft is an importance area for neuroscientists to analyze the macromolecular complexes related to neurotransmission.
+Synaptic cleft is an important area for neuroscientists to analyze the macromolecular complexes related to neurotransmitter transmission.
 However, the large amount of noise and low signal-to-noise ratio in raw electron micrographs make it significantly challenging to extract this region automatically.
 %
-In this paper, we propose a simple but effective framework to automatically extract accurate boundaries of synaptic cleft regions. 
-Our approach concatenates a contour growing step to a fully convolutional network (FCN), so that it takes the advantage of large receptive fields of FCNs to precisely localize the synaptic cleft region in a noisy image, and then precisely extract the region boundaries by a fine-level contour evolution technique. 
+In this paper, we propose a simple but effective framework to automatically extract accurate boundaries of synaptic cleft regions.
+Our approach concatenates a contour growing step to a fully convolutional network (FCN), so that it takes the advantage of large receptive fields of FCNs to precisely localize the synaptic cleft region in a noisy image, and then precisely extract the region boundaries by a fine-level contour evolution technique.
 %
 While considering both the texture and contours, our approach is more robust to noises, and outperforms all existing single-model FCNs on accurate segmentation in electron micrographs.
 
@@ -70,7 +70,7 @@ Synaptic clef extraction, fully convolutional networks, active contours, contour
 In this paper, we provide an effective method to segment the synaptic cleft region in challenging cryo-electron tomography data.
 With the help of pre-segmenting by CNNs, our contour growing algorithm can accurately localize the whole contour of the synaptic cleft, which is more robust to noise and complex texture of target region.
 Especially, a new updating strategy for contour evolving method is superior to traditional GVF, which can be extended to many tasks.
-The experiments show that our framework is very effective in segmenting synaptic cleft, which is significant for biomedical analysis.
+The experiments show that our framework is very effective in processing electron micrographs, which is significant for biological studying.
 
 %{\small
 %\bibliographystyle{ieee}

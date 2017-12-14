@@ -2,7 +2,7 @@
 \label{sec:intro}
 Electron micrographs (Fig.~\ref{fig:img} (a)) are obtained by cryo-electron tomography (CET) \cite{Hawkes2007}, which is an advanced technique to visualize the native environment of neurones, such as cytosol or lysate and lipid membranes~\cite{Lucic2005a}.
 %
-Among all kinds of cellular materials, biological macromolecules in synaptic cleft regions are one of the hottest study areas, as they play an important role in \change{neurotransmissions}.
+Among all kinds of cellular materials, biological macromolecules in synaptic cleft regions are one of the hottest study areas, as they play an important role in neurotransmission.
 %
 In the last decade, it mainly relied on manual segmentation of synaptic cleft regions, which is time-consuming and subjective, to analyze those macromolecules of interest.
 %
@@ -21,29 +21,29 @@ Finally, as the most of concerned macromolecules exist on the surface of presyna
         \includegraphics[width=3.4in]{figs/FigImg.pdf}
    \end{center}
 \caption{(a) An electron micrograph, where the red box indicates the synaptic cleft region.
-            (b) The yellow and green curves are respectively the presynaptic and postsynaptic membranes, which are exactly the contours of a synaptic cleft region. \xj{emphasize the region with a mask?} }
+            (b) The yellow and green curves are respectively the presynaptic and postsynaptic membranes, which are exactly the contours of a synaptic cleft region.}
 \label{fig:img}
 \end{figure}
+
+\begin{figure*}[t]
+    \begin{center}
+        \includegraphics[width=7in]{figs/FigCG.pdf}
+   \end{center}
+\caption{A brief view of our algorithm in localizing the synaptic cleft region. First a FCN-based model provides a coarse segmentation mask, which can give an initial centric curve (green line) in cleft region.
+        Then, the initial curve is respectively evolved along opposite direction ($\mathbf{n}_+$ and $\mathbf{n}_-$) to obtain two pieces of initial contours (red dotted line).
+        Finally, the two contours will synchronously grow to localize the whole synaptic cleft region (encircled by red solid curves).}
+\label{fig:cg}
+\end{figure*}
 
 
 Recently, fully convolutional networks (FCN)~\cite{Long2015,Ronneberger2015,Chen2016a,Chen2017,Zhao2016} have made a significant process in image segmentation, and variants of FCN \cite{Ronneberger2015,Chen2017,Dhungel2015,Lieman-Sifry2017,Chen2016b,Ourselin} show their promising performance in biomedical image processing.
 %
 The famous U-net~\cite{Ronneberger2015} directly concatenates the features from downsampling to upsampling layers for the better contour localization.
 Soon after, Chen et al.~\cite{Chen2016a} developed the dilated convolution operation by introducing zeros into the original convolutional kernels for larger receptive fields and achieved amazing performance in natural image segmentation.
-DCAN~\cite{Chen2017} integrates complementary information of objects and contours in a multi-task learning framework to separate the clustered \xj{crowded? adherent?} objects into individual ones.
+DCAN~\cite{Chen2017} integrates complementary information of objects and contours in a multi-task learning framework to separate the crowed objects into individual ones.
 Moreover, PSPNet~\cite{Zhao2016} uses the more powerful ResNet~\cite{He2016} for feature extracting and proposes a pyramid pooling module to better exploit the global context information.
 %
 Although these techniques have achieved a great success in many datasets, they still face challenges when processing electron micrographs, which have unique textures and structures.
-
-\begin{figure*}[t]
-    \begin{center}
-        \includegraphics[width=7in]{figs/FigCG.pdf}
-   \end{center}
-\caption{A brief view of our algorithm in localizing the synaptic cleft region. First a FCN-based model provides a coarse segmentation mask, which can give an initial curve (green line) in cleft region.
-        Then, the initial curve is respectively evolved along opposite direction ($\mathbf{n}_+$ and $\mathbf{n}_-$) to obtain two pieces of initial contours (red dotted line).
-        Finally, the two contours will synchronously grow to localize the whole synaptic cleft region (encircled by red solid curves).}
-\label{fig:cg}
-\end{figure*}
 
 \comments{
 Though FCNs have difficulties on extracting precise boundaries for synaptic cleft, our method is built on FCNs, taking their advantages of efficiently localizing the synaptic cleft region in a large-size electron micrograph.
@@ -77,12 +77,11 @@ Leventon et al.~\cite{Leventon2003Statistical} and Tsai et al.~\cite{Tsai2003A} 
 Latter, open active contour models have been proposed for medical image analysis, which are designed for extracting tree-shaped structures \cite{Li2009Actin,Xu2013EXTRACTION} by evolving and growing.
 Li et al.~\cite{Li2009Actin} introduced the famous stretching open active contour (SOAC) model for extracting actin filaments, by adding non-intensity-adaptive stretching term.
 And Xu et al.~\cite{Xu2013EXTRACTION} proposed to extract the clear networks of actin filaments by automatically initializing multiple SOAC models and re-grouping their segmentations.
-\xj{However, these methods have difficulty on .xxxx. In comparison, we .... }
-
+However, these methods have difficulty on processing the noisy electron micrographs, thus we develop a novel contour growing model for better robustness.
 
 Our contour growing algorithm is robust and efficient, because it is a self-correcting model and uses the local texture information for inference.
-With a coarse segmentation of target region, the method first generates a piece of accurate contour from the mask as origin and then gradually grows the whole contours of the target region.
-Especially, as long as the major part of the initial curve is successfully evolved to the target contour, the following growing process will be not affected.
+With a coarse segmentation of target region, the method first generates a piece of accurate contour using active contour model as origin and then gradually grows the whole contours of the target region.
+Especially, as long as the major part of initial curve is successfully evolved to the target contour, the following growing process will be not affected.
 %
 However, since the contour of a synaptic cleft is not closed and consists of the presynaptic and postsynaptic membranes as shown in Fig.~\ref{fig:img} (b), we should simultaneously grow two piece of contours and decide when the growing terminates according to the distance between these two membranes.
 

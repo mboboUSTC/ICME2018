@@ -8,9 +8,8 @@ b) a contour growing technique that uses the coarse segmentation as a start poin
 The pipeline of our framework is illustrated in Fig.~\ref{fig:cg}.
 
 \subsection{Pre-segmentation}
-
 To accurately localize the location of target regions, an FCN-style network is first implemented to provide a coarse segmentation for synaptic cleft.
-The architecture of the networks are based on DeepLab (ResNet-101)~\cite{Chen2016a}, which uses the dilated convolution for lager receptive fields. 
+The architecture of the networks are based on DeepLab (ResNet-101)~\cite{Chen2016a}, which uses the dilated convolution for lager receptive fields.
 %
 We also explore the effects of different networks to our framework in Sec.~\ref{sec:experiments} to demonstrate the robustness of our model.
 %
@@ -19,19 +18,16 @@ For the problem of limited data caused by the expensive acquisition, the transfe
 
 \xj{What happens if there are multiple cleft regions?}
 
-
-
 \subsection{Contour growing}
 
-Based on the binary mask from pre-segmentation, we first generate an \change{initial centric curve} from the mask, which will be subsequently evolved to the target contours.
+Based on the binary mask from pre-segmentation, we first generate an initial centric curve from the mask, which will be evolved to respectively attach to presynaptic and postsynaptical membranes.
+%
+Explicitly, the initial centric curve is obtained by truncating a quadratic curve fitted on the positive pixels of the mask.
 %
 In order to make sure that the initial centric curve is inside the cleft region, it will be generated as short as possible, such as the green dotted line in Fig.~\ref{fig:cg}.
-\xj{How do you determine the length? a fixed length? or a fixed ratio?}
-%
-The initial centric curve is evolved to respectively attach to the presynaptic and postsynaptical membranes, which are exactly the contours of synaptic cleft.
 %
 Then the contours at both sides are extended synchronously to extract the whole synaptic cleft region.
- 
+
 
 
 
@@ -42,37 +38,18 @@ Then the contours at both sides are extended synchronously to extract the whole 
 Similar to the traditional snake model~\cite{Kass1988}, the initial centric curve is expressed by a parameterized model $\mathbf{v}(s)=\big(x(s),y(s)\big)$, where $s\in[0,1]$ is the arc-length along the curve.
 Our goal is to minimize the following energy function:
 \begin{eqnarray}\label{Eq:Etotal}
-E_{total} =&\int_{0}^{1} E_{int}\big( \vb{v}(s) \big)+ E_{ext}\big( \mathbf{v}(s)\big) ds \\
-E_{int} = & \alpha\mathbf{v}^{'}(s)+\beta\mathbf{v}^{''}(s) \\\nonumber
+E_{total} =&\int_{0}^{1} E_{int}\big( \vb{v}(s) \big)+ E_{ext}\big( \mathbf{v}(s)\big) ds\nonumber \\
+E_{int} = & \alpha|\mathbf{v}^{'}(s)|+\beta|\mathbf{v}^{''}(s)| \\\nonumber
 E_{ext} =& I\big( \mathbf{v}(s)\big) + \kappa G\big(\mathbf{v}(s)\big),\nonumber
 \end{eqnarray}
-where $\mathbf{v}^{'}(s)$ and $\mathbf{v}^{''}(s)$ are the first-order and second-order derivatives of $\mathbf{v}(s)$.
-$I$ is the Gaussian smoothed image.
-$G$ is the gradient magnitude map.
-\xj{The first term tends to smooth curve?... The second term tends to dark and smooth regions?}
+where $\mathbf{v}^{'}(s)$ and $\mathbf{v}^{''}(s)$ are the first-order and second-order derivatives of $\mathbf{v}(s)$, controlling the curve to be smooth and straight.
+$E_{ext}$ consists of a Gaussian smoothed image $I$ and a gradient magnitude map $G$, which drive the curve to the edge region with dark pixel value.  
 According to \cite{Kass1988}, Eq.~\ref{Eq:Etotal} can be minimized by iteratively updating the following equation:
 \begin{eqnarray}\label{Eq:GVF}
-\mathbf{v}_{t+1}(s) = (\vb{A}+\gamma \vb{I})^{-1}(\gamma \mathbf{v}_t(s)+\mathbf{f}\{\mathbf{v}_t(s)\}),
+V_{t+1} = (\vb{A}+\gamma \vb{I})^{-1}(\gamma V_t+\mathbf{f}(V_t)),
 \end{eqnarray}
-where $\vb{A}$ is a matrix encoding the internal tension, $\gamma$ controls the evolving rate and $\mathbf{f}=[f_{x},f_{y}]$ are the gradient maps calculated from $E_{ext}$ using Gradient Vector Flow (GVF) algorithm \cite{Xu1998}.
-
-The updating strategy of Eq.~\ref{Eq:GVF} is very sensitive to the noise, which easily traps some control points.
-And the capture range of tension $\mathbf{f}$ is usually limited \cite{Cohen1991}, making its performance depend heavily on the initial curve.
-Our experiments illustrate the deficiencies of GVF in detail and show some representative cases in Fig.~\ref{fig:gvf}.
-Thus in this section, we propose a new updating strategy by:
-\begin{eqnarray}\label{Eq:update}
-\mathbf{v}_{t+1}(s) = (A+\gamma I)^{-1}(\gamma \mathbf{v}_t(s)+E_{ext}\{\mathbf{v}(s)\}\mathbf{n}\{\mathbf{v}_t(s)\})
-\end{eqnarray}
-$\mathbf{n}\{\mathbf{v}(s)\}$ are the normal vectors of $\mathbf{v}(s)$ with consistent orientations.
-
-In Eq.~\ref{Eq:update}, the direction of external tension are fixed as the normal direction of $\mathbf{v}_(s)$, whose magnitudes are controlled by $E_{ext}\{\mathbf{v}(s)\}$ instead of a constant value in Ballons model \cite{Cohen1991}.
-The advantages of Eq.~\ref{Eq:update} are follows:
-a) the capture range of external tension are much larger, due to fixed tension $\mathbf{n}\{\mathbf{v}(s)\}$;
-b) it is easier to reach the global optimum than GVF, because $E_{ext}$ will soon vanish in the contour region;
-c) In the noise region, once the internal tension pulls a trapped $\mathbf{v}(s)$ out, our external tension will soon push it away.
-The above situations are shown in Fig.~\ref{fig:gvf}.
-
-
+where $V\in R^{np\times2}$ and $np$ is the number of discrete controlling points of $\mathbf{v}(s)$.
+$\vb{A}$ is a matrix encoding the internal tension, $\gamma$ controls the evolving rate and $\mathbf{f}=[f_{x},f_{y}]$ are the gradient maps calculated from $E_{ext}$ using Gradient Vector Flow (GVF) algorithm \cite{Xu1998}.
 
 \begin{figure}[t]
 	\begin{center}
@@ -83,9 +60,27 @@ The above situations are shown in Fig.~\ref{fig:gvf}.
 	\label{fig:gvf}
 \end{figure}
 
+However the updating strategy of Eq.~\ref{Eq:GVF} is not robust in our electron micrographs with high noise.
+Firstly, in some flat regions with small gradients $\mathbf{f}$, the external tension is too weak to drive the controlling points $V_{np}$ to move against to internal tension.
+Therefore, it requires the initial curve to be away from the flat regions.
+Secondly, the external tension in some noisy regions will be gyrate, which easily trap some control points.
+Although sometimes the internal tension may pull the trapped points out, the gyrate $\mathbf{f}$ will trap them again.
+Thirdly, as the gradients $\mathbf{f}$ near to contours are usually large, $V_{np}$ easily cross the optimal positions by over-huge tension,
+Top row cases of Fig.~\ref{fig:gvf} represents the above discussion.
+Thus in this section, we propose a new updating strategy by:
+\begin{eqnarray}\label{Eq:update}
+V_{t+1} = (A+\gamma I)^{-1}(\gamma V_t+E_{ext}(V_t)N)
+\end{eqnarray}
+$N\in R^{np\times2}$ consists of the normal vectors of $np$ controlling points with consistent orientations.
 
+In Eq.~\ref{Eq:update}, the moving direction of each $V_{np}$ drove by external tension is fixed as its normal direction $N_{np}$, whose magnitude is $E_{ext}(V_{np})$ rather than a constant value in Ballons model \cite{Cohen1991}.
+The advantages of Eq.~\ref{Eq:update} are follows:
+a) the capture range of external tension are much larger, due to fixed external tension $E_{ext}(V)N$;
+b) once $V_{np}$ is pulled away from the noisy region, $E_{ext}(V_{np})N_{np}$ will soon push it away.
+c) our external tension will soon vanish in contour region due to small $E_{ext}$, which makes the updating more robust.
+Bottom row cases of Fig.~\ref{fig:gvf} show our superiority over GVF.
 
-By setting opposite normal vectors ($\mathbf{n}_{+}$ and $\mathbf{n}_{-}$ in Figure~\ref{fig:cg}), $\mathbf{v}(s)$ will be evolved along opposite direction and well attach to both presynaptic and postsynaptical membranes.
+By setting opposite normal vectors ($\mathbf{n}_{+}$ and $\mathbf{n}_{-}$ in Figure~\ref{fig:cg}), $V$ will be evolved along opposite direction and well attach to both presynaptic and postsynaptical membranes.
 The final evolved curves are respectively denoted as $\mathbf{c}_1(s)$ and $\mathbf{c}_2(s)$.
 
 \begin{figure}[t]
@@ -94,9 +89,7 @@ The final evolved curves are respectively denoted as $\mathbf{c}_1(s)$ and $\mat
  \centerline{\epsfig{figure=Figs/FigG.pdf,width=8.5cm}}
 \end{minipage}
 \caption{An example of contour growing formulated by Eq.~\ref{Eq:sg}.
-        The yellow solid arrow indicates the growing direction of previous stages.
-        The dotted arrows visualize the candidates of next growing direction, and the direction with the darkest color is our preferred.
-        After finding the optimal length, the longest arrow is chosen as a new piece of growing contour.}
+        The yellow solid arrow indicates the growing direction of previous stages, the dotted arrows are the candidates of growing direction, and the longest arrow with darkest color is the most preferable.}
 \label{fig:g}
 \end{figure}
 
@@ -104,35 +97,34 @@ The final evolved curves are respectively denoted as $\mathbf{c}_1(s)$ and $\mat
 With two pieces of contour $\mathbf{c}_1(s)$ and $\mathbf{c}_2(s)$, we then grow them to localize the whole presynaptic and postsynaptic membranes.
 The challenge of this part is that they should be grown correctly and synchronously to compute the exact distance between two membranes for termination judging.
 
-First, we formulate the process of growing $\mathbf{c}_1(s)$ as finding a piece of straight line $\mathbf{l}(s)$ by:
+First, we formulate the process of growing $\mathbf{c}_1(s)$ as iteratively finding a piece of straight line with length $l$ and unit vector $\mathbf{k}$:
 \begin{eqnarray}\label{Eq:sg}
-&\arg\min_{\mathbf{l}(s)} E_{int}\{\mathbf{l}(s)+c_1(1))\}+\rho(\overrightarrow{c_1}(1)*\overrightarrow{l}(0))\\
-&st.~\tau_1\leq (\overrightarrow{c_1}(0)*\overrightarrow{l}(0))\leq \tau_2\nonumber
+&\arg\min\limits_{l,\mathbf{k}} \sum\limits_{i=0}^{l}E_{int}(i\mathbf{k}+\mathbf{e})\}-\rho(\mathbf{e}^{'}\mathbf{k}^{T})\\
+&st.~\tau_1\leq \mathbf{e}^{'}\mathbf{k}^{T}\leq \tau_2\nonumber
 \end{eqnarray}
-where $*$ defines the inner product of two vectors.
-$c_1(1)$ is the end point of curve $\mathbf{c}_1$ and $\overrightarrow{c_1}(1)$ is the tangent vector of point $c_1(1)$.
-Especially, $\mathbf{l}(s)$ can be expressed by a direction vector $\overrightarrow{l}(0))$ and a length variable $l$.
-The firs term of Eq.~\ref{Eq:sg} expects the $\mathbf{l}(s)$ to grow along the membranes with low $E_{ext}$, while the second term hope the grow direction to follow the previous direction.
+where $\mathbf{e}$ is the endpoint of $\mathbf{c}_1(s)$, and $\mathbf{e}^{'}$ is the tangent vector of $\mathbf{e}$.
+Similarly, we use $l$ points to represent the target straight line for convenience.
+The firs term of Eq.~\ref{Eq:sg} expects $\mathbf{c}_1(s)$ to grow along the membranes with low $E_{ext}$, while the second term hope the grow direction to follow the previous direction.
 $\rho$ is a tradeoff parameter, and $\tau_1,\tau_2$ add a hard restraint on the growing direction to be not changed too much.
 
-Optimal solution of Eq.~\ref{Eq:sg} can be obtained by using the EM algorithm.
-Explicitly, we first fixed $l$ to find an optimal $\overrightarrow{l}(0))$, and then fix $\overrightarrow{l}(0))$ to find a better $l$.
+Optimal solution of Eq.~\ref{Eq:sg} can be obtained by alternate updating.
+First, we fixed $l$ as a small value, such as $5$ in our task, to find an optimal $\mathbf{k}$, and then fix $\mathbf{k}$ to find a better $l$.
 Experiments show that two times of iteration is enough for most cases to give a satisfying piece of new growing membrane as shown in Fig.~\ref{fig:g}.
 
 Next to synchronously grow $\mathbf{c}_1(s)$ and $\mathbf{c}_2(s)$, we split the growing process into several periods and decide which curve grows in each period.
 Especially, we set two variables $g_1^{t+1}$ and $g_2^{t+1}$  ($1$ for growing and $0$ for waiting) to determine the growing state of $\mathbf{c}_1^{t}(s)$ and $\mathbf{c}_2^{t}(s)$ at stage $t+1$ by:
 \begin{eqnarray}\label{Eq:gf}
 g_1^{t+1},g_2^{t+1} = \left\{\begin{array}{cc}
-0,1&if \overrightarrow{c}^t_1(1)*(c_2^t(1)-c_1^t(1))\geq 0 \\
-1,0&if \overrightarrow{c}^t_1(1)*(c_2^t(1)-c_1^t(0))\leq 0\\
+0,1&if~(\mathbf{e}_1^t-\mathbf{e}_2^t)(\mathbf{e}_3^t-\mathbf{e}_2^t)^{T}\geq 0 \\
+1,0&if~(\mathbf{e}_2^t-\mathbf{e}_1^t)(\mathbf{e}_3^t-\mathbf{e}_1^t)^{T}\geq 0\\
 1,1& else\\
 \end{array}\right.
 \end{eqnarray}
-where $c_1^t(0)$, $c_1^t(1)$ and $c_2^t(1)$ are three endpoints of two growing membranes as shown in Figure~\ref{fig:sg}.
+where $\mathbf{e}_1^t$, $\mathbf{e}_2^t$ and $\mathbf{e}_3^t$ are three endpoints of two membranes of stage $t$, as shown in Figure~\ref{fig:sg}.
 Different situations of Eq.~\ref{Eq:gf} are shown in Figure~\ref{fig:sg}.
 And the distance between two membranes can be then calculated by:
 \begin{eqnarray}\label{Eq:d}
-d^{t+1} = \frac{||c_1^{t+1}(1)-c_2^{t+1}(1)||+ ||c_1^{t+1}(0)-c_2^{t+1}(0)||}{2}
+d^{t+1} = \frac{||\mathbf{e}_1^{t+1}-\mathbf{e}_3^{t+1}||+ ||\mathbf{e}_1^{t}-\mathbf{e}_3^{t}||}{2}
 \end{eqnarray}
 Once $d^{t+1}$ is beyond the range of reasonable cleft width, the growing will be terminated.
 \begin{figure}[t]

@@ -26,14 +26,7 @@ We use two metrics \cite{Cheng2017} to evaluate our method on segmentation task:
 a) pixel accuracy, which evaluates the percentage of positive true pixels over the whole pixels;
 b) pixel intersection-overunion (IOU) averaged across different classes.
 
-\begin{figure}[t]
-\begin{center}
-        \includegraphics[width=3.4in]{figs/FigGVF.pdf}
-   \end{center}
-%
-\caption{Several cases of tension field obtained by GVF (top row) and our normal force (bottom row). The red arrow indicates the force vector of external tension.}
-\label{fig:gvf}
-\end{figure}
+
 ~ \noindent\textbf{Superiority of Eq.~\ref{Eq:update}.}
 In this part, we visualize the deficiencies of traditional updating Eq.~\ref{Eq:GVF} in GVF and represent the superiority of our strategy of Eq.~\ref{Eq:update}.
 Firstly, in some flat regions with small gradients $\mathbf{f}$, the external tension is too weak to drive $\mathbf{v}(s)$ to move against to internal tension.

@@ -2,40 +2,59 @@
 \label{sec:algorithm}
 
 
-Our proposed algorithm consists of two steps:
+Our proposed algorithm consists of two main parts:
 a) a FCN-style network providing a coarse segmentation of synaptic cleft;
-b) a contour growing algorithm that uses the coarse segmentation to localize the whole contours of synaptic cleft region.
+b) a contour growing technique that uses the coarse segmentation as a start point to extract the whole contours of the synaptic cleft region.
 The pipeline of our framework is illustrated in Fig.~\ref{fig:cg}.
 
 \subsection{Pre-segmentation}
 
-To accurately localize the location of target regions, an FCN-style network is first implemented to give a coarse segmentation for synaptic cleft.
-The architecture of the networks are based on famous DeepLab (ResNet-101) \cite{Chen2016a}, which uses the dilated convolution for lager reception field, and we further explore the effects of different networks to our model in Sec.~\ref{sec:experiments} to demonstrated the robustness of our model to initial segmentation.
+To accurately localize the location of target regions, an FCN-style network is first implemented to provide a coarse segmentation for synaptic cleft.
+The architecture of the networks are based on DeepLab (ResNet-101)~\cite{Chen2016a}, which uses the dilated convolution for lager receptive fields. 
 %
-Differently, we change the classifier of DeepLab to be a binary classifier and use a weighted loss for mitigating unbalanced label problem in our task.
-For the problem of limited data caused by expensive acquisition, the transfer learning strategy is used by fine-tuning the weights of lower layers on the off-the-shelf model from DeepLab, which has been well trained on natural images.
+We also explore the effects of different networks to our framework in Sec.~\ref{sec:experiments} to demonstrate the robustness of our model.
+%
+For the synaptic cleft segmentation, we modify the classifier of DeepLab to a binary classifier and use a weighted loss for mitigating the unbalanced label problem in our task.
+For the problem of limited data caused by the expensive acquisition, the transfer learning strategy is used by fine-tuning the weights of lower layers on the off-the-shelf model from DeepLab, which have been well trained on natural images.
 
-\subsection{Contour growing algorithm}
-\subsubsection{curve evolving}
+\xj{What happens if there are multiple cleft regions?}
+
+
+
+\subsection{Contour growing}
+
+Based on the binary mask from pre-segmentation, we first generate an \change{initial centric curve} from the mask, which will be subsequently evolved to the target contours.
+%
+In order to make sure that the initial centric curve is inside the cleft region, it will be generated as short as possible, such as the green dotted line in Fig.~\ref{fig:cg}.
+\xj{How do you determine the length? a fixed length? or a fixed ratio?}
+%
+The initial centric curve is evolved to respectively attach to the presynaptic and postsynaptical membranes, which are exactly the contours of synaptic cleft.
+%
+Then the contours at both sides are extended synchronously to extract the whole synaptic cleft region.
+ 
+
+
+
+\subsubsection{Curve evolving}
 \label{sec:curve_evolving}
-Based on the binary mask from pre-segmentation, we first generate an initial curve from the mask, which will be subsequently evolved to attach to the target contours.
-%
-In order to make sure that the initial curve is inside the cleft region, it will be generated as short as possible, such as the green dotted line in Fig.~\ref{fig:cg}.
-Then the initial curve will be evolved twice to respectively attach to presynaptic and postsynaptical membranes, which are exactly the contours of synaptic cleft.
 
-Similar to traditional snake model \cite{Kass1988}, the initial curve is expressed by $\mathbf{v}(s)=[x(s),y(s)]$, where $s\in[0,1]$, and our goal is to minimize the following energy function:
+
+Similar to the traditional snake model~\cite{Kass1988}, the initial centric curve is expressed by a parameterized model $\mathbf{v}(s)=\big(x(s),y(s)\big)$, where $s\in[0,1]$ is the arc-length along the curve.
+Our goal is to minimize the following energy function:
 \begin{eqnarray}\label{Eq:Etotal}
-E_{total} =& \int_{0}^{1}\big[\alpha\mathbf{v}^{'}(s)+\beta\mathbf{v}^{''}(s)+E_{ext}\{\mathbf{v}(s)\}\big]ds \\
-E_{ext} =& \int_{0}^{1}\big[I\{\mathbf{v}(s)\} + \kappa G\{\mathbf{v}(s)\}\big]ds\nonumber
+E_{total} =&\int_{0}^{1} E_{int}\big( \vb{v}(s) \big)+ E_{ext}\big( \mathbf{v}(s)\big) ds \\
+E_{int} = & \alpha\mathbf{v}^{'}(s)+\beta\mathbf{v}^{''}(s) \\\nonumber
+E_{ext} =& I\big( \mathbf{v}(s)\big) + \kappa G\big(\mathbf{v}(s)\big),\nonumber
 \end{eqnarray}
 where $\mathbf{v}^{'}(s)$ and $\mathbf{v}^{''}(s)$ are the first-order and second-order derivatives of $\mathbf{v}(s)$.
 $I$ is the Gaussian smoothed image.
 $G$ is the gradient magnitude map.
-According to \cite{Kass1988}, minimizing Eq.~\ref{Eq:Etotal} can be obtained by iteratively updating the following equation:
+\xj{The first term tends to smooth curve?... The second term tends to dark and smooth regions?}
+According to \cite{Kass1988}, Eq.~\ref{Eq:Etotal} can be minimized by iteratively updating the following equation:
 \begin{eqnarray}\label{Eq:GVF}
-\mathbf{v}_{t+1}(s) = (A+\gamma I)^{-1}(\gamma \mathbf{v}_t(s)+\mathbf{f}\{\mathbf{v}_t(s)\})
+\mathbf{v}_{t+1}(s) = (\vb{A}+\gamma \vb{I})^{-1}(\gamma \mathbf{v}_t(s)+\mathbf{f}\{\mathbf{v}_t(s)\}),
 \end{eqnarray}
-where $A$ is a matrix encoding the internal tension, $\gamma$ controls the evolving rate and $\mathbf{f}=[f_{x},f_{y}]$ are the gradient maps calculated from $E_{ext}$ using Gradient Vector Flow (GVF) algorithm \cite{Xu1998}.
+where $\vb{A}$ is a matrix encoding the internal tension, $\gamma$ controls the evolving rate and $\mathbf{f}=[f_{x},f_{y}]$ are the gradient maps calculated from $E_{ext}$ using Gradient Vector Flow (GVF) algorithm \cite{Xu1998}.
 
 The updating strategy of Eq.~\ref{Eq:GVF} is very sensitive to the noise, which easily traps some control points.
 And the capture range of tension $\mathbf{f}$ is usually limited \cite{Cohen1991}, making its performance depend heavily on the initial curve.
@@ -53,6 +72,19 @@ b) it is easier to reach the global optimum than GVF, because $E_{ext}$ will soo
 c) In the noise region, once the internal tension pulls a trapped $\mathbf{v}(s)$ out, our external tension will soon push it away.
 The above situations are shown in Fig.~\ref{fig:gvf}.
 
+
+
+\begin{figure}[t]
+	\begin{center}
+		\includegraphics[width=3.4in]{figs/FigGVF.pdf}
+	\end{center}
+	%
+	\caption{Several cases of tension field obtained by GVF (top row) and our normal force (bottom row). The red arrow indicates the force vector of external tension.}
+	\label{fig:gvf}
+\end{figure}
+
+
+
 By setting opposite normal vectors ($\mathbf{n}_{+}$ and $\mathbf{n}_{-}$ in Figure~\ref{fig:cg}), $\mathbf{v}(s)$ will be evolved along opposite direction and well attach to both presynaptic and postsynaptical membranes.
 The final evolved curves are respectively denoted as $\mathbf{c}_1(s)$ and $\mathbf{c}_2(s)$.
 
@@ -68,7 +100,7 @@ The final evolved curves are respectively denoted as $\mathbf{c}_1(s)$ and $\mat
 \label{fig:g}
 \end{figure}
 
-\subsubsection{synchronous growing}
+\subsubsection{Synchronous growing}
 With two pieces of contour $\mathbf{c}_1(s)$ and $\mathbf{c}_2(s)$, we then grow them to localize the whole presynaptic and postsynaptic membranes.
 The challenge of this part is that they should be grown correctly and synchronously to compute the exact distance between two membranes for termination judging.
 

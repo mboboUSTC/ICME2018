@@ -2,16 +2,16 @@
 \label{sec:algorithm}
 
 
-Our proposed algorithm consists of two main parts:
-a) a FCN-style network providing a coarse segmentation of synaptic cleft;
-b) a contour growing technique that uses the coarse segmentation as a start point to extract the whole contours of the synaptic cleft region.
-The pipeline of our framework is illustrated in Fig.~\ref{fig:cg}.
+Our algorithm consists of two main parts:
+a) \change{an} FCN-style network providing \change{initial} segmentation of the synaptic cleft;
+b) a contour growing technique that uses the coarse segmentation as a start point to extract the whole contours.
+The pipeline is illustrated in Fig.~\ref{fig:cg}.
 
-\subsection{Pre-segmentation}
-To accurately localize the location of target regions, an FCN-style network is first implemented to provide a coarse segmentation for synaptic cleft.
-The architecture of the networks are based on DeepLab (ResNet-101)~\cite{Chen2016a}, which uses the dilated convolution for lager receptive fields.
+\subsection{FCN segmentation}
+%To accurately localize the location of target regions, an FCN-style network is first implemented to provide a coarse segmentation for synaptic cleft.
+\change{The network architecture is} based on DeepLab (ResNet-101)~\cite{Chen2016a}, which uses the dilated convolution for lager receptive fields.
 %
-We also explore the effects of different networks to our framework in Sec.~\ref{sec:experiments} to demonstrate the robustness of our model.
+We also explore \change{different network architectures in our framework and the results demonstrate the robustness of our model in Sec.~\ref{sec:experiments}.}
 %
 For the synaptic cleft segmentation, we modify the classifier of DeepLab to a binary classifier and use a weighted loss for mitigating the unbalanced label problem in our task.
 For the problem of limited data caused by the expensive acquisition, the transfer learning strategy is used by fine-tuning the weights of lower layers on the off-the-shelf model from DeepLab, which have been well trained on natural images.
@@ -20,13 +20,16 @@ For the problem of limited data caused by the expensive acquisition, the transfe
 
 \subsection{Contour growing}
 
-Based on the binary mask from pre-segmentation, we first generate an initial centric curve from the mask, which will be evolved to respectively attach to presynaptic and postsynaptical membranes.
+Based on the binary mask from \change{FCN} segmentation, we first generate an initial centric curve, which will be evolved to respectively attach to presynaptic and postsynaptical membranes.
 %
-Explicitly, the initial centric curve is obtained by truncating a quadratic curve fitted on the positive pixels of the mask.
+\change{More specifically}, the initial centric curve is obtained by \change{fitting a quadratic spline on all the positive pixels in the mask and truncating the middle part in a small length.}
+%truncating a quadratic curve fitted on the positive pixels of the mask.
 %
 In order to make sure that the initial centric curve is inside the cleft region, it will be generated as short as possible, such as the green dotted line in Fig.~\ref{fig:cg}.
 %
-Then the contours at both sides are extended synchronously to extract the whole synaptic cleft region.
+\change{The initial centric curve is first evolved on the two opposite directions to 
+	find the contours of both the presynaptic and postsynaptical membranes.}
+Then the contours at the two sides are extended synchronously to extract the whole synaptic cleft region.
 
 
 
@@ -80,7 +83,7 @@ b) once $V_{np}$ is pulled away from the noisy region, $E_{ext}(V_{np})N_{np}$ w
 c) our external tension will soon vanish in contour region due to small $E_{ext}$, which makes the updating more robust.
 Bottom row cases of Fig.~\ref{fig:gvf} show our superiority over GVF.
 
-By setting opposite normal vectors ($\mathbf{n}_{+}$ and $\mathbf{n}_{-}$ in Figure~\ref{fig:cg}), $V$ will be evolved along opposite direction and well attach to both presynaptic and postsynaptical membranes.
+By setting \change{two} opposite normal vectors ($\mathbf{n}_{+}$ and $\mathbf{n}_{-}$ in Figure~\ref{fig:cg}), \change{the centric curve} will be evolved along two opposite directions and well attach to the presynaptic and postsynaptical membranes.
 The final evolved curves are respectively denoted as $\mathbf{c}_1(s)$ and $\mathbf{c}_2(s)$.
 
 \begin{figure}[t]
@@ -88,30 +91,33 @@ The final evolved curves are respectively denoted as $\mathbf{c}_1(s)$ and $\mat
   \centering
  \centerline{\epsfig{figure=Figs/FigG.pdf,width=8.5cm}}
 \end{minipage}
-\caption{An example of contour growing formulated by Eq.~\ref{Eq:sg}.
-        The yellow solid arrow indicates the growing direction of previous stages, the dotted arrows are the candidates of growing direction, and the longest arrow with darkest color is the most preferable.}
+\caption{The contour growing process formulated by Eq.~\ref{Eq:sg}.
+        The yellow solid arrow indicates the growing direction of previous stages. The dotted arrows are the candidates of growing direction. The longest arrow is the selected growing contour.}
 \label{fig:g}
 \end{figure}
 
 \subsubsection{Synchronous growing}
-With two pieces of contour $\mathbf{c}_1(s)$ and $\mathbf{c}_2(s)$, we then grow them to localize the whole presynaptic and postsynaptic membranes.
+
+With the two initial pieces of contour $\mathbf{c}_1(s)$ and $\mathbf{c}_2(s)$, we then grow them to localize the whole \change{cleft region}.
 The challenge of this part is that they should be grown correctly and synchronously to compute the exact distance between two membranes for termination judging.
 
-First, we formulate the process of growing $\mathbf{c}_1(s)$ as iteratively finding a piece of straight line with length $l$ and unit vector $\mathbf{k}$:
+First, we formulate the process of growing a contour $\mathbf{c}_(s)$ as iteratively finding a piece of straight line segment with length $l$ and unit vector $\mathbf{v}_l$:
 \begin{eqnarray}\label{Eq:sg}
-&\arg\min\limits_{l,\mathbf{k}} \sum\limits_{i=0}^{l}E_{int}(i\mathbf{k}+\mathbf{e})\}-\rho(\mathbf{e}^{'}\mathbf{k}^{T})\\
-&st.~\tau_1\leq \mathbf{e}^{'}\mathbf{k}^{T}\leq \tau_2\nonumber
+&\arg\min\limits_{l,\mathbf{v}_l} \sum\limits_{i=0}^{l}E_{int}(i\mathbf{v}_l+\mathbf{q}) -\rho\|\mathbf{v}_q \cdot \mathbf{v}_l\|,\\
+&st.~ |\mathbf{v}_q \cdot \mathbf{v}_l| \leq \tau, \nonumber
 \end{eqnarray}
-where $\mathbf{e}$ is the endpoint of $\mathbf{c}_1(s)$, and $\mathbf{e}^{'}$ is the tangent vector of $\mathbf{e}$.
-Similarly, we use $l$ points to represent the target straight line for convenience.
-The firs term of Eq.~\ref{Eq:sg} expects $\mathbf{c}_1(s)$ to grow along the membranes with low $E_{ext}$, while the second term hope the grow direction to follow the previous direction.
-$\rho$ is a tradeoff parameter, and $\tau_1,\tau_2$ add a hard restraint on the growing direction to be not changed too much.
+where $\mathbf{q}$ is the current endpoint of $\mathbf{c}(s)$, and $\mathbf{v}_{q}$ is the tangent vector of $\mathbf{q}$ on the curve.
+%
+Similarly, we use $l$ points to represent the target straight line length for convenience.
+The firs term of Eq.~\ref{Eq:sg} expects $\mathbf{c}_(s)$ to grow along the membranes with low \change{$E_{ext}$}, while the second term \change{prefers the growing direction following the previous direction of the contour}.
+$\rho$ is a tradeoff parameter, and $\tau$ add a hard \change{constraint} on the growing direction to be not changed too much.
+%
+Optimal solution of Eq.~\ref{Eq:sg} can be obtained by alternatively updating $l$ and $\vb{v}_l$.
+First, we fixed $l$ as a small value ($5$ pixels), to find the optimal $\vb{v}_l$, and then fix $\vb{v}_l$ to find a better $l$.
+Experiments show that two iterations are good enough for most cases to generate a satisfying piece of new growing membrane, as shown in Fig.~\ref{fig:g}.
 
-Optimal solution of Eq.~\ref{Eq:sg} can be obtained by alternate updating.
-First, we fixed $l$ as a small value, such as $5$ in our task, to find an optimal $\mathbf{k}$, and then fix $\mathbf{k}$ to find a better $l$.
-Experiments show that two times of iteration is enough for most cases to give a satisfying piece of new growing membrane as shown in Fig.~\ref{fig:g}.
-
-Next to synchronously grow $\mathbf{c}_1(s)$ and $\mathbf{c}_2(s)$, we split the growing process into several periods and decide which curve grows in each period.
+To synchronously grow $\mathbf{c}_1(s)$ and $\mathbf{c}_2(s)$, we split the growing process into several periods and decide which curve grows in each period.
+%
 Especially, we set two variables $g_1^{t+1}$ and $g_2^{t+1}$  ($1$ for growing and $0$ for waiting) to determine the growing state of $\mathbf{c}_1^{t}(s)$ and $\mathbf{c}_2^{t}(s)$ at stage $t+1$ by:
 \begin{eqnarray}\label{Eq:gf}
 g_1^{t+1},g_2^{t+1} = \left\{\begin{array}{cc}
@@ -120,13 +126,13 @@ g_1^{t+1},g_2^{t+1} = \left\{\begin{array}{cc}
 1,1& else\\
 \end{array}\right.
 \end{eqnarray}
-where $\mathbf{e}_1^t$, $\mathbf{e}_2^t$ and $\mathbf{e}_3^t$ are three endpoints of two membranes of stage $t$, as shown in Figure~\ref{fig:sg}.
-Different situations of Eq.~\ref{Eq:gf} are shown in Figure~\ref{fig:sg}.
-And the distance between two membranes can be then calculated by:
+where $\mathbf{e}_1^t$, $\mathbf{e}_2^t$ and $\mathbf{e}_3^t$ are the three endpoints of two membranes of stage $t$.
+Different situations of Eq.~\ref{Eq:gf} are shown in Fig.~\ref{fig:sg}.
+The distance between two membranes is calculated by:
 \begin{eqnarray}\label{Eq:d}
-d^{t+1} = \frac{||\mathbf{e}_1^{t+1}-\mathbf{e}_3^{t+1}||+ ||\mathbf{e}_1^{t}-\mathbf{e}_3^{t}||}{2}
+d^{t+1} = \frac{||\mathbf{e}_1^{t+1}-\mathbf{e}_3^{t+1}||+ ||\mathbf{e}_1^{t}-\mathbf{e}_3^{t}||}{2}.
 \end{eqnarray}
-Once $d^{t+1}$ is beyond the range of reasonable cleft width, the growing will be terminated.
+Once $d^{t+1}$ is beyond the range of \change{a} reasonable cleft width, the \change{growth is} terminated.
 \begin{figure}[t]
 \begin{minipage}[b]{1.0\linewidth}
   \centering

@@ -18,11 +18,11 @@ All the image are observed in the raw resolution and labeled by biomedical exper
 \noindent\textbf{Implementation details.}
 The training strategy of our DeepLab module follows the original paper~\cite{Chen2016a}.
 For such a large resolution, we crop a $321\times 321$ region from the original image as the input to DeepLab.
-In order to avoid over fitting, the training dataset is augmented by flipping and rotation, which leads to finally $19200$ images.
+In order to avoid \change{overfitting}, the training dataset is augmented by flipping and rotation, which leads to finally $19200$ images.
 %
-During the curve evolving, $\alpha$, $\beta$, $\kappa$ and $\gamma$ are respectively set as $0.2$, $0.2$, $0.3$ and $1$, which can give a best performance in our dataset.
-For synchronous growing, $\rho$ is set as $0.25$ and $\tau_1$, $\tau_2$ are $-\frac{\sqrt{2}}{2}$, $\frac{\sqrt{2}}{2}$ to constrain the growing direction deviating $[-\frac{\pi}{4},\frac{\pi}{4}]$ from the previous growing direction.
-When $d^{t}$ is beyond the range of $[40,80]$, the growth is terminated.
+During the curve evolving, $\alpha$, $\beta$, $\kappa$ in Eq.~\ref{Eq:Etotal} and $\gamma$ in Eq.~\ref{Eq:update} are respectively set as $0.2$, $0.2$, $0.3$ and $1$, which can give the best performance in our dataset.
+For synchronous growing, $\rho=0.25$ and $\tau=\frac{\sqrt{2}}{2}$ in Eq.~\ref{Eq:sg} to constrain the growing direction deviating $[-\frac{\pi}{4},\frac{\pi}{4}]$ from the previous growing direction.
+When $d^{t}$ in Eq.~\ref{Eq:d} is beyond the range of $[40,80]$, the growth is terminated.
 
 
 
@@ -32,14 +32,17 @@ a) pixel accuracy, which evaluates the percentage of positive true pixels over a
 b) pixel intersection-over-union (IOU) averaged across different classes (two labels in our task).
 %
 We compare our proposed method with several state-of-the-art segmentation methods, including FCN~\cite{Long2015}, U-net~\cite{Ronneberger2015}, DeepLab~\cite{Chen2016a} and PSPNet~\cite{Zhao2016} on the synaptic cleft segmentation task.
-Especially, DeepLab indicates the ResNet101 version of \cite{Chen2016a} and our default pre-segmentation model in our experiments .
+Especially, DeepLab indicates the ResNet101 version of \cite{Chen2016a}.
+% and our default pre-segmentation model in our experiments .
 
-~ \noindent\textbf{Results}
-Table~\ref{tab:report1} reports the pixel accuracy and mean IOU of different methods, while Fig.~ represents some visual instances of these methods.
-Our model gives the best performance among existing methods and our localized contours are much more precise and complete than any single FCN-based method.
-Fig.~\ref{FigSeg1} show the cropped segmentation results of different methods for better observation, and more results with raw-resolution are provided in supplementary materials. 
+\noindent\textbf{Results}
+Table~\ref{tab:report1} reports the pixel accuracy and mean IOU of different methods.
+%while Fig.~\ref{FigSeg1} \change{presents the segmenation examples}.
+Our method outperforms the existing methods and our localized contours are much more precise and complete than any single FCN-based method.
+Fig.~\ref{FigSeg1} compares the cropped segmentation results of different methods.
+More results with the raw-resolution are provided in supplementary materials. 
 %
-Especially, Unet performs better than FCN, due to richer features extracted by the U-shaped architecture.
+Especially, U-net performs better than FCN, due to richer features extracted by the U-shaped architecture.
 %
 The effects of pyramid pooling module used in the PSPNet are not obvious compared to DeepLab in our task.
 And the results of DeepLab and PSPNet are better than other FCNs, which demonstrates the effectiveness of deeper ResNet.
@@ -47,17 +50,17 @@ From Fig.~\ref{FigSeg1}, FCNs can localize the correct positions of synaptic cle
 
 \begin{table}[t]
 \begin{center}
-\caption{Results on segmenting synaptic cleft region, comparing with state of the art segmentation methods.} \label{tab:report1}
+\caption{Results on segmenting synaptic cleft region, comparing with state-of-the-art methods.} \label{tab:report1}
 \begin{tabular}{|c|c|c|}
   \hline
   % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
-   & Pixel Accu. & mean IOU
+  Methods & Pixel Accu. & mean IOU
   \\
   \hline
   FCN~\cite{Long2015} & 0.9923 & 0.5258 \\
-  Unet~\cite{Ronneberger2015} &  0.9939 & 0.6359 \\
+  U-net~\cite{Ronneberger2015} &  0.9939 & 0.6359 \\
   DeepLab~\cite{Chen2016a} & 0.9951 & 0.7164 \\
-  PSPNet~\cite{Chen2016a} & 0.9949 & 0.7195 \\
+  PSPNet~\cite{Zhao2016} & 0.9949 & 0.7195 \\
   Ours & $\mathbf{0.9974}$ & $\mathbf{0.7848}$ \\
   \hline
 \end{tabular}
@@ -72,15 +75,15 @@ And observed from Fig.~\ref{FigSeg2}, as long as the correct location of synapti
 
 \begin{table}[t]
 \begin{center}
-\caption{Effects of different pre-segmentation to our contour growing method.} \label{tab:report2}
+\caption{\change{Contour growing performance from various pre-segmentations.}} \label{tab:report2}
 \begin{tabular}{|c|c|c|}
   \hline
   % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
-   & Pixel Accu. & mean IOU
+  Methods & Pixel Accu. & mean IOU
   \\
   \hline
   Contour Growing$+$FCN & 0.9956 & 0.6339 \\
-  Contour Growing$+$Unet & 0.9962 & 0.7720 \\
+  Contour Growing$+$U-net & 0.9962 & 0.7720 \\
   Contour Growing$+$DeepLab & \textbf{0.9974} & \textbf{0.7848} \\
   Contour Growing$+$PSPNet & 0.9961 & 0.7683 \\
   \hline
@@ -91,23 +94,23 @@ And observed from Fig.~\ref{FigSeg2}, as long as the correct location of synapti
 
 \begin{figure*}
 	%	\centering
-	\subfigure[Image]{
+	\subfigure[Input Image]{
 		\label{fig:vesicle_img} %% label for first subfigure
 		\includegraphics[height=2.3in,width=0.32\columnwidth]{figs/FigSeg1a.pdf}}
 	%\hspace{0.2cm}
-	\subfigure[FCN]{
+	\subfigure[FCN~\cite{Long2015}]{
 		\label{fig:vesicle_DeepLab} %% label for second subfigure
 		\includegraphics[height=2.3in,width=0.32\columnwidth]{figs/FigSeg1b.pdf}}
     %\hspace{0.2cm}
-	\subfigure[U-net]{
+	\subfigure[U-net~\cite{Ronneberger2015}]{
 		\label{fig:vesicle_Unet} %% label for second subfigure
 		\includegraphics[height=2.3in,width=0.32\columnwidth]{figs/FigSeg1c.pdf}}
     %\hspace{0.2cm}
-	\subfigure[DeepLab]{
+	\subfigure[DeepLab~\cite{Chen2016a}]{
 		\label{fig:vesicle_dcan} %% label for second subfigure
 		\includegraphics[height=2.3in,width=0.32\columnwidth]{figs/FigSeg1d.pdf}}
     %\hspace{0.2cm}
-	\subfigure[PSPNet]{
+	\subfigure[PSPNet~\cite{Zhao2016}]{
 		\label{fig:vesicle_dsan} %% label for second subfigure
 		\includegraphics[height=2.3in,width=0.32\columnwidth]{figs/FigSeg1e.pdf}}
     %\hspace{0.2cm}
@@ -122,19 +125,19 @@ And observed from Fig.~\ref{FigSeg2}, as long as the correct location of synapti
 
 \begin{figure}
 	\centering
-	\subfigure[FCN]{
+	\subfigure[FCN~\cite{Long2015}]{
 		\label{fig:seg2:fcn} %% label for first subfigure
 		\includegraphics[height=1.6in,width=0.23\columnwidth]{figs/FigSeg2a.pdf}}
 	%\hspace{0.01cm}
-	\subfigure[U-net]{
+	\subfigure[U-net~\cite{Ronneberger2015}]{
 		\label{fig:seg2:unet} %% label for second subfigure
 		\includegraphics[height=1.6in,width=0.23\columnwidth]{figs/FigSeg2b.pdf}}
     %\hspace{0.05cm}
-	\subfigure[DeepLab]{
+	\subfigure[DeepLab~\cite{Chen2016a}]{
 		\label{fig:seg2:deeplab} %% label for second subfigure
 		\includegraphics[height=1.6in,width=0.23\columnwidth]{figs/FigSeg2c.pdf}}
     %\hspace{0.05cm}
-	\subfigure[PSPNet]{
+	\subfigure[PSPNet~\cite{Zhao2016}]{
 		\label{fig:seg2:pspnet} %% label for second subfigure
 		\includegraphics[height=1.6in,width=0.23\columnwidth]{figs/FigSeg2d.pdf}}
 	\caption{ Segmentation of our contour growing with different pre-segmentation model.}

@@ -40,11 +40,11 @@
 %
 \begin{abstract}
 
-Synaptic cleft is an important area for neuroscientists to analyze the macromolecular complexes related to neurotransmitter transmission.
+Synaptic cleft is an important area for neuroscientists to analyze the macromolecular complexes related to \change{neurotransmission}.
 However, the large amount of noise and low signal-to-noise ratio in raw electron micrographs make it significantly challenging to extract this region automatically.
 %
 In this paper, we propose a simple but effective framework to automatically extract accurate boundaries of synaptic cleft regions.
-Our approach concatenates a contour growing step to a fully convolutional network (FCN), so that it takes the advantage of large receptive fields of FCNs to precisely localize the synaptic cleft region in a noisy image, and then extract the region boundaries by a fine-level contour evolution technique.
+Our approach concatenates a contour growing step to a fully convolutional network (FCN), so that it takes the advantage of large receptive fields of FCNs to precisely localize the synaptic cleft region in a noisy image, and extracts the region boundaries by a fine-level contour evolution technique.
 %
 While considering both the texture and contours, our approach is more robust to noises, and outperforms all existing single-model FCNs on accurate segmentation of synaptic clefts in electron micrographs.
 
@@ -52,7 +52,7 @@ While considering both the texture and contours, our approach is more robust to 
 \end{abstract}
 %
 \begin{keywords}
-Synaptic clef extraction, fully convolutional networks, active contours, contour growing
+Synaptic clef extraction, fully convolutional networks, active contour, contour growing
 \end{keywords}
 %
 %%%%%%%%% BODY TEXT
@@ -60,11 +60,15 @@ Synaptic clef extraction, fully convolutional networks, active contours, contour
 %\input{Related}
 \input{Methods}
 \input{Experiments}
+
+
 \section{CONCLUSION}
 \label{sec:conclusion}
-In this paper, we provide an effective method to segment the synaptic cleft region in challenging cryo-electron tomography data.
-With the help of pre-segmenting by CNNs, our contour growing algorithm can accurately localize the whole contour of the synaptic cleft, which is more robust to noise and complex texture of target region.
-Especially, a new updating strategy for contour evolving method is superior to traditional GVF, which can be extended to many tasks.
+
+In this paper, we provide an effective method to segment synaptic cleft regions in the challenging cryo-electron tomography data.
+%
+With the help of pre-segmenting by \change{FCNs}, our contour growing algorithm can accurately localize the whole contour of the synaptic cleft, which is more robust to noises and complex textures.
+Especially, \change{our} novel updating strategy for contour evolving is superior to the traditional GVF, which can be extended to many tasks.
 The experiments show that our framework is very effective in processing electron micrographs, which is significant for biological studying.
 
 %{\small
